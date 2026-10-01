@@ -25,23 +25,31 @@ class KelasController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_kelas' => 'required|string|max:50|unique:kelas,nama_kelas',
-            'wali_kelas' => 'nullable|string|max:150',
+            'nama_kelas' => 'required|string|min:2|max:50|unique:kelas,nama_kelas',
+            'wali_kelas' => 'nullable|string|min:3|max:150',
         ], [
             'nama_kelas.required' => 'Nama kelas wajib diisi.',
+            'nama_kelas.min' => 'Nama kelas minimal 2 karakter.',
             'nama_kelas.unique' => 'Nama kelas sudah ada.',
             'nama_kelas.max' => 'Nama kelas maksimal 50 karakter.',
+            'wali_kelas.min' => 'Nama wali kelas minimal 3 karakter.',
             'wali_kelas.max' => 'Nama wali kelas maksimal 150 karakter.',
         ]);
 
-        Kelas::create([
-            'nama_kelas' => $request->nama_kelas,
-            'wali_kelas' => $request->wali_kelas,
-        ]);
+        try {
+            Kelas::create([
+                'nama_kelas' => $request->nama_kelas,
+                'wali_kelas' => $request->wali_kelas,
+            ]);
 
-        return redirect()
-            ->route('kelas.index')
-            ->with('success', 'Data kelas berhasil ditambahkan.');
+            return redirect()
+                ->route('kelas.index')
+                ->with('success', 'Data kelas berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal menambahkan data kelas: ' . $e->getMessage());
+        }
     }
 
     public function show($id)
@@ -67,41 +75,56 @@ class KelasController extends Controller
             'nama_kelas' => [
                 'required',
                 'string',
+                'min:2',
                 'max:50',
                 Rule::unique('kelas', 'nama_kelas')->ignore($kelas->id),
             ],
-            'wali_kelas' => 'nullable|string|max:150',
+            'wali_kelas' => 'nullable|string|min:3|max:150',
         ], [
             'nama_kelas.required' => 'Nama kelas wajib diisi.',
+            'nama_kelas.min' => 'Nama kelas minimal 2 karakter.',
             'nama_kelas.unique' => 'Nama kelas sudah ada.',
             'nama_kelas.max' => 'Nama kelas maksimal 50 karakter.',
+            'wali_kelas.min' => 'Nama wali kelas minimal 3 karakter.',
             'wali_kelas.max' => 'Nama wali kelas maksimal 150 karakter.',
         ]);
 
-        $kelas->update([
-            'nama_kelas' => $request->nama_kelas,
-            'wali_kelas' => $request->wali_kelas,
-        ]);
+        try {
+            $kelas->update([
+                'nama_kelas' => $request->nama_kelas,
+                'wali_kelas' => $request->wali_kelas,
+            ]);
 
-        return redirect()
-            ->route('kelas.index')
-            ->with('success', 'Data kelas berhasil diperbarui.');
+            return redirect()
+                ->route('kelas.index')
+                ->with('success', 'Data kelas berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal memperbarui data kelas: ' . $e->getMessage());
+        }
     }
 
     public function destroy($id)
     {
-        $kelas = Kelas::findOrFail($id);
+        try {
+            $kelas = Kelas::findOrFail($id);
 
-        if ($kelas->siswa()->count() > 0) {
+            if ($kelas->siswa()->count() > 0) {
+                return redirect()
+                    ->route('kelas.index')
+                    ->with('error', 'Kelas tidak bisa dihapus karena masih memiliki ' . $kelas->siswa()->count() . ' siswa.');
+            }
+
+            $kelas->delete();
+
             return redirect()
                 ->route('kelas.index')
-                ->with('error', 'Kelas tidak bisa dihapus karena masih memiliki siswa.');
+                ->with('success', 'Data kelas berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('kelas.index')
+                ->with('error', 'Gagal menghapus data kelas: ' . $e->getMessage());
         }
-
-        $kelas->delete();
-
-        return redirect()
-            ->route('kelas.index')
-            ->with('success', 'Data kelas berhasil dihapus.');
     }
 }

@@ -41,6 +41,43 @@ class SiswaImport implements ToCollection, WithHeadingRow
 
             if (!$nama) {
                 $errors[] = "Baris {$baris}: nama siswa wajib diisi.";
+            } elseif (strlen($nama) < 3) {
+                $errors[] = "Baris {$baris}: nama siswa minimal 3 karakter.";
+            }
+
+            if ($nis && !preg_match('/^[0-9.]+$/', $nis)) {
+                $errors[] = "Baris {$baris}: NIS hanya boleh berisi angka dan titik (contoh: 2047.26).";
+            }
+
+            if ($nis && strlen($nis) < 4) {
+                $errors[] = "Baris {$baris}: NIS minimal 4 digit.";
+            }
+
+            if ($nisn && !preg_match('/^[0-9]+$/', $nisn)) {
+                $errors[] = "Baris {$baris}: NISN hanya boleh berisi angka.";
+            }
+
+            if ($nisn && strlen($nisn) != 10) {
+                $errors[] = "Baris {$baris}: NISN harus 6 digit.";
+            }
+
+            $noHp = $this->value($row, 'no_hp');
+            if ($noHp && !preg_match('/^[0-9]+$/', $noHp)) {
+                $errors[] = "Baris {$baris}: No HP siswa hanya boleh berisi angka.";
+            }
+
+            if ($noHp && (strlen($noHp) < 10 || strlen($noHp) > 15)) {
+                $errors[] = "Baris {$baris}: No HP siswa harus 8-15 digit.";
+            }
+
+            $noHpOrangTua = $this->value($row, 'no_hp_orang_tua');
+            if ($noHpOrangTua && !preg_match('/^[0-9]+$/', $noHpOrangTua)) {
+                $errors[] = "Baris {$baris}: No HP orang tua hanya boleh berisi angka.";
+            }
+
+            $noHpWali = $this->value($row, 'no_hp_wali');
+            if ($noHpWali && !preg_match('/^[0-9]+$/', $noHpWali)) {
+                $errors[] = "Baris {$baris}: No HP wali hanya boleh berisi angka.";
             }
 
             if (!$adaOrangTua && !$adaWali) {

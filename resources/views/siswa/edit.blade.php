@@ -17,7 +17,7 @@
         </div>
     @enderror
 
-    <form action="{{ route('siswa.update', $siswa->id) }}" method="POST">
+    <form action="{{ route('siswa.update', $siswa->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -36,6 +36,57 @@
                         <div class="form-error">{{ $message }}</div>
                     @enderror
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">NIK</label>
+
+                <input
+                    type="text"
+                    name="nik"
+                    class="form-control"
+                    value="{{ old('nik', $siswa->nik) }}"
+                    required
+                >
+
+                @error('nik')
+                    <div class="form-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="form-group">
+    <label class="form-label">Foto Siswa</label>
+
+    @if ($siswa->foto)
+        <div style="margin-bottom: 12px;">
+            <img
+                src="{{ asset('storage/' . $siswa->foto) }}"
+                alt="Foto {{ $siswa->nama }}"
+                style="
+                    width: 100px;
+                    height: 125px;
+                    object-fit: cover;
+                    border-radius: 10px;
+                    border: 1px solid #e2e8f0;
+                "
+            >
+        </div>
+    @endif
+
+    <input
+        type="file"
+        name="foto"
+        class="form-control"
+        accept=".jpg,.jpeg,.png,.webp"
+    >
+
+    <small style="color: #64748b;">
+        Kosongkan jika tidak ingin mengganti foto.
+    </small>
+
+    @error('foto')
+        <div class="form-error">{{ $message }}</div>
+    @enderror
+</div>
 
                 <div class="form-group">
                     <label class="form-label">NIS</label>

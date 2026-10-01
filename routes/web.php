@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\MutasiController;
+use App\Http\Controllers\StatistikController;
 
 Route::get('/', function () {
     return redirect('/dashboard');
@@ -28,7 +30,30 @@ Route::get('/siswa/{id}/edit', [SiswaController::class, 'edit'])->name('siswa.ed
 Route::put('/siswa/{id}', [SiswaController::class, 'update'])->name('siswa.update');
 Route::patch('/siswa/{id}/keluarkan-kelas', [SiswaController::class, 'keluarkanDariKelas'])->name('siswa.keluarkan-kelas');
 Route::delete('/siswa/{id}', [SiswaController::class, 'destroy'])->name('siswa.destroy');
+Route::post('/siswa/bulk-action', [SiswaController::class, 'bulkAction'])
+    ->name('siswa.bulk-action');
 Route::get('/siswa/{id}', [SiswaController::class, 'show'])->name('siswa.show');
 
 Route::get('/export', [ExportController::class, 'index'])->name('export.index');
 Route::get('/export/siswa', [ExportController::class, 'siswa'])->name('export.siswa');
+
+Route::get('/mutasi', [MutasiController::class, 'index'])
+    ->name('mutasi.index');
+
+Route::get('/mutasi/masuk', [MutasiController::class, 'createMasuk'])
+    ->name('mutasi.masuk');
+
+Route::post('/mutasi/masuk', [MutasiController::class, 'storeMasuk'])
+    ->name('mutasi.masuk.store');
+
+Route::get('/mutasi/keluar', [MutasiController::class, 'createKeluar'])
+    ->name('mutasi.keluar');
+
+Route::post('/mutasi/keluar', [MutasiController::class, 'storeKeluar'])
+    ->name('mutasi.keluar.store');
+
+Route::post('/mutasi/bulk-delete', [MutasiController::class, 'bulkDelete'])
+    ->name('mutasi.bulk-delete');
+
+Route::get('/statistik', [StatistikController::class, 'index'])
+    ->name('statistik.index');

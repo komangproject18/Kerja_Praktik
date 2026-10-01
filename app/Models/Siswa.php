@@ -10,6 +10,9 @@ class Siswa extends Model
 
     protected $fillable = [
         'nama',
+        'nik',
+        'foto',
+        'status_siswa',
         'nis',
         'nisn',
         'tempat_lahir',
@@ -38,5 +41,10 @@ class Siswa extends Model
     public function wali()
     {
         return $this->hasOne(Wali::class, 'siswa_id');
+    }
+
+    public function mutasi()
+    {
+        return $this->hasMany(Mutasi::class, 'siswa_id');
     }
 }
