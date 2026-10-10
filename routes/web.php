@@ -7,6 +7,9 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\MutasiController;
 use App\Http\Controllers\StatistikController;
+use App\Http\Controllers\TahunAjaranController;
+use App\Http\Controllers\AlumniController;
+use App\Http\Controllers\RiwayatKelasController;
 
 Route::get('/', function () {
     return redirect('/dashboard');
@@ -21,6 +24,8 @@ Route::get('/kelas/{id}/edit', [KelasController::class, 'edit'])->name('kelas.ed
 Route::put('/kelas/{id}', [KelasController::class, 'update'])->name('kelas.update');
 Route::delete('/kelas/{id}', [KelasController::class, 'destroy'])->name('kelas.destroy');
 Route::get('/kelas/{id}', [KelasController::class, 'show'])->name('kelas.show');
+Route::post('/kelas/{id}/naik-kelas', [KelasController::class, 'naikKelas'])->name('kelas.naik-kelas');
+Route::post('/kelas/{id}/jadikan-alumni', [KelasController::class, 'jadikanAlumni'])->name('kelas.jadikan-alumni');
 
 Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
 Route::get('/siswa/create', [SiswaController::class, 'create'])->name('siswa.create');
@@ -57,3 +62,34 @@ Route::post('/mutasi/bulk-delete', [MutasiController::class, 'bulkDelete'])
 
 Route::get('/statistik', [StatistikController::class, 'index'])
     ->name('statistik.index');
+
+Route::get('/tahun-ajaran', [TahunAjaranController::class, 'index'])
+    ->name('tahun-ajaran.index');
+
+Route::get('/tahun-ajaran/create', [TahunAjaranController::class, 'create'])
+    ->name('tahun-ajaran.create');
+
+Route::post('/tahun-ajaran', [TahunAjaranController::class, 'store'])
+    ->name('tahun-ajaran.store');
+
+Route::get('/tahun-ajaran/{id}/edit', [TahunAjaranController::class, 'edit'])
+    ->name('tahun-ajaran.edit');
+
+Route::put('/tahun-ajaran/{id}', [TahunAjaranController::class, 'update'])
+    ->name('tahun-ajaran.update');
+
+Route::patch('/tahun-ajaran/{id}/activate', [TahunAjaranController::class, 'activate'])
+    ->name('tahun-ajaran.activate');
+
+Route::delete('/tahun-ajaran/{id}', [TahunAjaranController::class, 'destroy'])
+    ->name('tahun-ajaran.destroy');
+
+Route::post('/tahun-ajaran/{id}/sinkronkan', [TahunAjaranController::class, 'sinkronkan'])
+    ->name('tahun-ajaran.sinkronkan');
+
+Route::get('/alumni', [AlumniController::class, 'index'])
+    ->name('alumni.index');
+
+Route::get('/riwayat-kelas',[RiwayatKelasController::class, 'index'])->name('riwayat-kelas.index');
+
+Route::get('/riwayat-kelas/export',[RiwayatKelasController::class, 'export'])->name('riwayat-kelas.export');

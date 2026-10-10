@@ -408,7 +408,338 @@
             margin-top: 6px;
         }
 
-        /* ALERT */
+        /* =========================================================
+   TOAST NOTIFICATION
+========================================================= */
+
+        .toast-container {
+            position: fixed;
+            top: 82px;
+            right: 24px;
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: min(390px, calc(100vw - 32px));
+            pointer-events: none;
+        }
+
+        .app-toast {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+            padding: 15px 16px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow:
+                0 18px 45px rgba(15, 23, 42, 0.14),
+                0 2px 8px rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+            pointer-events: auto;
+
+            opacity: 0;
+            transform: translateX(24px);
+            animation: toast-in 0.28s ease forwards;
+        }
+
+        .app-toast.toast-hide {
+            animation: toast-out 0.25s ease forwards;
+        }
+
+        .toast-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+
+        .toast-message {
+            color: var(--muted);
+            font-size: 13.5px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .toast-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .toast-close:hover {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .toast-progress {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3px;
+            width: 100%;
+            transform-origin: left;
+            animation: toast-progress 4s linear forwards;
+        }
+
+        /* SUCCESS */
+
+        .app-toast.toast-success {
+            border-left: 4px solid #16a34a;
+        }
+
+        .toast-success .toast-icon {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .toast-success .toast-progress {
+            background: #16a34a;
+        }
+
+        /* ERROR */
+
+        .app-toast.toast-error {
+            border-left: 4px solid #dc2626;
+        }
+
+        .toast-error .toast-icon {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .toast-error .toast-progress {
+            background: #dc2626;
+        }
+
+        /* WARNING */
+
+        .app-toast.toast-warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .toast-warning .toast-icon {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .toast-warning .toast-progress {
+            background: #f59e0b;
+        }
+
+        /* INFO */
+
+        .app-toast.toast-info {
+            border-left: 4px solid #0284c7;
+        }
+
+        .toast-info .toast-icon {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .toast-info .toast-progress {
+            background: #0284c7;
+        }
+
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateX(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes toast-out {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(24px);
+            }
+        }
+
+        @keyframes toast-progress {
+            from {
+                transform: scaleX(1);
+            }
+
+            to {
+                transform: scaleX(0);
+            }
+        }
+
+
+        /* =========================================================
+   CONFIRMATION MODAL
+========================================================= */
+
+        .confirm-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 6000;
+            background: rgba(15, 23, 42, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+
+            opacity: 0;
+            visibility: hidden;
+            transition:
+                opacity 0.2s ease,
+                visibility 0.2s ease;
+        }
+
+        .confirm-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .confirm-modal {
+            width: 100%;
+            max-width: 430px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+
+            box-shadow:
+                0 24px 70px rgba(15, 23, 42, 0.22),
+                0 4px 16px rgba(15, 23, 42, 0.08);
+
+            padding: 24px;
+
+            transform: scale(0.96) translateY(8px);
+            transition: transform 0.2s ease;
+        }
+
+        .confirm-modal-overlay.show .confirm-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .confirm-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 17px;
+
+            background: #fee2e2;
+            color: #b91c1c;
+
+            font-size: 23px;
+            font-weight: 700;
+        }
+
+        .confirm-modal.confirm-warning .confirm-icon-wrapper {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .confirm-modal.confirm-info .confirm-icon-wrapper {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .confirm-title {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .confirm-message {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--muted);
+        }
+
+        .confirm-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .confirm-button {
+            min-width: 88px;
+        }
+
+        .confirm-button-danger {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .confirm-button-danger:hover {
+            background: #b91c1c;
+        }
+
+        .confirm-button-warning {
+            background: #f59e0b;
+            color: #ffffff;
+        }
+
+        .confirm-button-warning:hover {
+            background: #d97706;
+        }
+
+        .confirm-button-primary {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .confirm-button-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+
+        /* ALERT LAMA UNTUK VALIDASI DI DALAM HALAMAN */
+
         .alert {
             padding: 12px 14px;
             border-radius: 10px;
@@ -424,6 +755,28 @@
         .alert-error {
             background: #fee2e2;
             color: #991b1b;
+        }
+
+
+        @media (max-width: 600px) {
+            .toast-container {
+                top: 74px;
+                right: 16px;
+                left: 16px;
+                width: auto;
+            }
+
+            .confirm-modal {
+                padding: 20px;
+            }
+
+            .confirm-actions {
+                flex-direction: column-reverse;
+            }
+
+            .confirm-actions .btn {
+                width: 100%;
+            }
         }
 
         /* ACTION BUTTONS */
@@ -642,8 +995,22 @@
                     Daftar Kelas
                 </a>
 
+                <a href="{{ route('tahun-ajaran.index') }}"
+                    class="{{ request()->is('tahun-ajaran*') ? 'active' : '' }}">
+                    Tahun Ajaran
+                </a>
+
+                <a href="{{ route('riwayat-kelas.index') }}"
+                    class="{{ request()->is('riwayat-kelas*') ? 'active' : '' }}">
+                    Riwayat Kelas
+                </a>
+
                 <a href="{{ route('mutasi.index') }}" class="{{ request()->is('mutasi*') ? 'active' : '' }}">
                     Mutasi Siswa
+                </a>
+
+                <a href="{{ route('alumni.index') }}" class="{{ request()->is('alumni*') ? 'active' : '' }}">
+                    Alumni
                 </a>
 
                 <a href="{{ route('statistik.index') }}" class="{{ request()->is('statistik*') ? 'active' : '' }}">
@@ -674,37 +1041,603 @@
             </header>
 
             <section class="content">
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="alert alert-error">
-                        {{ session('error') }}
-                    </div>
-                @endif
                 @yield('content')
             </section>
         </main>
     </div>
 
+    {{-- =====================================================
+    GLOBAL TOAST NOTIFICATION
+    ===================================================== --}}
+
+    <div class="toast-container" id="toastContainer">
+
+        @if (session('success'))
+            <div class="app-toast toast-success" data-toast>
+                <div class="toast-icon">
+                    ✓
+                </div>
+
+                <div class="toast-content">
+                    <div class="toast-title">
+                        Berhasil
+                    </div>
+
+                    <div class="toast-message">
+                        {{ session('success') }}
+                    </div>
+                </div>
+
+                <button type="button" class="toast-close" aria-label="Tutup" onclick="closeToast(this)">
+                    ×
+                </button>
+
+                <div class="toast-progress"></div>
+            </div>
+        @endif
+
+
+        @if (session('error'))
+            <div class="app-toast toast-error" data-toast>
+                <div class="toast-icon">
+                    !
+                </div>
+
+                <div class="toast-content">
+                    <div class="toast-title">
+                        Gagal
+                    </div>
+
+                    <div class="toast-message">
+                        {{ session('error') }}
+                    </div>
+                </div>
+
+                <button type="button" class="toast-close" aria-label="Tutup" onclick="closeToast(this)">
+                    ×
+                </button>
+
+                <div class="toast-progress"></div>
+            </div>
+        @endif
+
+
+        @if (session('warning'))
+            <div class="app-toast toast-warning" data-toast>
+                <div class="toast-icon">
+                    !
+                </div>
+
+                <div class="toast-content">
+                    <div class="toast-title">
+                        Perhatian
+                    </div>
+
+                    <div class="toast-message">
+                        {{ session('warning') }}
+                    </div>
+                </div>
+
+                <button type="button" class="toast-close" aria-label="Tutup" onclick="closeToast(this)">
+                    ×
+                </button>
+
+                <div class="toast-progress"></div>
+            </div>
+        @endif
+
+    </div>
+
+    {{-- =====================================================
+    GLOBAL CONFIRMATION MODAL
+    ===================================================== --}}
+
+    <div class="confirm-modal-overlay" id="confirmModalOverlay" aria-hidden="true">
+        <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true"
+            aria-labelledby="confirmModalTitle">
+
+            <div class="confirm-icon-wrapper" id="confirmModalIcon">
+                !
+            </div>
+
+            <div class="confirm-title" id="confirmModalTitle">
+                Konfirmasi
+            </div>
+
+            <div class="confirm-message" id="confirmModalMessage">
+                Apakah Anda yakin ingin melanjutkan?
+            </div>
+
+            <div class="confirm-actions">
+
+                <button type="button" class="btn btn-secondary confirm-button" id="confirmCancelButton">
+                    Batal
+                </button>
+
+                <button type="button" class="btn confirm-button confirm-button-danger" id="confirmOkButton">
+                    Lanjutkan
+                </button>
+
+            </div>
+        </div>
+    </div>
+
     <script>
+        /*
+        |--------------------------------------------------------------------------
+        | SIDEBAR
+        |--------------------------------------------------------------------------
+        */
+
         const menuToggle = document.getElementById('menuToggle');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-        menuToggle.addEventListener('click', function () {
-            if (window.innerWidth <= 768) {
-                document.body.classList.toggle('sidebar-open');
-            } else {
-                document.body.classList.toggle('sidebar-collapsed');
-            }
-        });
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function () {
+                if (window.innerWidth <= 768) {
+                    document.body.classList.toggle('sidebar-open');
+                } else {
+                    document.body.classList.toggle('sidebar-collapsed');
+                }
+            });
+        }
 
-        sidebarOverlay.addEventListener('click', function () {
-            document.body.classList.remove('sidebar-open');
-        });
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function () {
+                document.body.classList.remove('sidebar-open');
+            });
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOAST NOTIFICATION
+        |--------------------------------------------------------------------------
+        */
+
+        function closeToast(button) {
+            const toast = button.closest('.app-toast');
+
+            if (!toast) {
+                return;
+            }
+
+            hideToast(toast);
+        }
+
+
+        function hideToast(toast) {
+            if (!toast || toast.classList.contains('toast-hide')) {
+                return;
+            }
+
+            toast.classList.add('toast-hide');
+
+            setTimeout(function () {
+                toast.remove();
+            }, 250);
+        }
+
+
+        function setupToast(toast) {
+            setTimeout(function () {
+                hideToast(toast);
+            }, 4000);
+        }
+
+
+        document
+            .querySelectorAll('[data-toast]')
+            .forEach(function (toast) {
+                setupToast(toast);
+            });
+
+
+
+        window.showToast = function (
+            message,
+            type = 'success',
+            title = null
+        ) {
+            const container = document.getElementById(
+                'toastContainer'
+            );
+
+            if (!container) {
+                return;
+            }
+
+            const config = {
+                success: {
+                    title: 'Berhasil',
+                    icon: '✓'
+                },
+
+                error: {
+                    title: 'Gagal',
+                    icon: '!'
+                },
+
+                warning: {
+                    title: 'Perhatian',
+                    icon: '!'
+                },
+
+                info: {
+                    title: 'Informasi',
+                    icon: 'i'
+                }
+            };
+
+            const selected =
+                config[type] || config.info;
+
+            const toast = document.createElement('div');
+
+            toast.className =
+                'app-toast toast-' + type;
+
+            toast.setAttribute(
+                'data-toast',
+                ''
+            );
+
+            const icon = document.createElement('div');
+            icon.className = 'toast-icon';
+            icon.textContent = selected.icon;
+
+            const content =
+                document.createElement('div');
+
+            content.className =
+                'toast-content';
+
+            const toastTitle =
+                document.createElement('div');
+
+            toastTitle.className =
+                'toast-title';
+
+            toastTitle.textContent =
+                title || selected.title;
+
+            const toastMessage =
+                document.createElement('div');
+
+            toastMessage.className =
+                'toast-message';
+
+            toastMessage.textContent =
+                message;
+
+            content.appendChild(
+                toastTitle
+            );
+
+            content.appendChild(
+                toastMessage
+            );
+
+            const closeButton =
+                document.createElement('button');
+
+            closeButton.type = 'button';
+
+            closeButton.className =
+                'toast-close';
+
+            closeButton.setAttribute(
+                'aria-label',
+                'Tutup'
+            );
+
+            closeButton.textContent = '×';
+
+            closeButton.addEventListener(
+                'click',
+                function () {
+                    hideToast(toast);
+                }
+            );
+
+            const progress =
+                document.createElement('div');
+
+            progress.className =
+                'toast-progress';
+
+            toast.appendChild(icon);
+            toast.appendChild(content);
+            toast.appendChild(closeButton);
+            toast.appendChild(progress);
+
+            container.appendChild(toast);
+
+            setupToast(toast);
+        };
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GLOBAL CONFIRMATION MODAL
+        |--------------------------------------------------------------------------
+        */
+
+        const confirmModalOverlay =
+            document.getElementById(
+                'confirmModalOverlay'
+            );
+
+        const confirmModal =
+            document.getElementById(
+                'confirmModal'
+            );
+
+        const confirmModalTitle =
+            document.getElementById(
+                'confirmModalTitle'
+            );
+
+        const confirmModalMessage =
+            document.getElementById(
+                'confirmModalMessage'
+            );
+
+        const confirmModalIcon =
+            document.getElementById(
+                'confirmModalIcon'
+            );
+
+        const confirmCancelButton =
+            document.getElementById(
+                'confirmCancelButton'
+            );
+
+        const confirmOkButton =
+            document.getElementById(
+                'confirmOkButton'
+            );
+
+        let confirmResolver = null;
+
+
+        window.showConfirm = function ({
+            title = 'Konfirmasi',
+            message = 'Apakah Anda yakin ingin melanjutkan?',
+            confirmText = 'Lanjutkan',
+            cancelText = 'Batal',
+            type = 'danger'
+        } = {}) {
+
+            return new Promise(function (resolve) {
+
+                confirmResolver = resolve;
+
+                confirmModalTitle.textContent =
+                    title;
+
+                confirmModalMessage.textContent =
+                    message;
+
+                confirmOkButton.textContent =
+                    confirmText;
+
+                confirmCancelButton.textContent =
+                    cancelText;
+
+
+                /*
+                |-----------------------------------------
+                | RESET TYPE
+                |-----------------------------------------
+                */
+
+                confirmModal.classList.remove(
+                    'confirm-warning',
+                    'confirm-info'
+                );
+
+                confirmOkButton.classList.remove(
+                    'confirm-button-danger',
+                    'confirm-button-warning',
+                    'confirm-button-primary'
+                );
+
+
+                /*
+                |-----------------------------------------
+                | APPLY TYPE
+                |-----------------------------------------
+                */
+
+                if (type === 'warning') {
+
+                    confirmModal.classList.add(
+                        'confirm-warning'
+                    );
+
+                    confirmOkButton.classList.add(
+                        'confirm-button-warning'
+                    );
+
+                    confirmModalIcon.textContent =
+                        '!';
+
+                } else if (type === 'info') {
+
+                    confirmModal.classList.add(
+                        'confirm-info'
+                    );
+
+                    confirmOkButton.classList.add(
+                        'confirm-button-primary'
+                    );
+
+                    confirmModalIcon.textContent =
+                        'i';
+
+                } else {
+
+                    confirmOkButton.classList.add(
+                        'confirm-button-danger'
+                    );
+
+                    confirmModalIcon.textContent =
+                        '!';
+                }
+
+
+                confirmModalOverlay.classList.add(
+                    'show'
+                );
+
+                confirmModalOverlay.setAttribute(
+                    'aria-hidden',
+                    'false'
+                );
+
+                document.body.classList.add(
+                    'modal-open'
+                );
+
+                setTimeout(function () {
+                    confirmOkButton.focus();
+                }, 100);
+            });
+        };
+
+
+        function closeConfirmModal(result) {
+
+            confirmModalOverlay.classList.remove(
+                'show'
+            );
+
+            confirmModalOverlay.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
+            document.body.classList.remove(
+                'modal-open'
+            );
+
+            if (confirmResolver) {
+                confirmResolver(result);
+                confirmResolver = null;
+            }
+        }
+
+
+        confirmOkButton.addEventListener(
+            'click',
+            function () {
+                closeConfirmModal(true);
+            }
+        );
+
+
+        confirmCancelButton.addEventListener(
+            'click',
+            function () {
+                closeConfirmModal(false);
+            }
+        );
+
+
+        confirmModalOverlay.addEventListener(
+            'click',
+            function (event) {
+
+                if (
+                    event.target ===
+                    confirmModalOverlay
+                ) {
+                    closeConfirmModal(false);
+                }
+            }
+        );
+
+
+        document.addEventListener(
+            'keydown',
+            function (event) {
+
+                if (
+                    event.key === 'Escape' &&
+                    confirmModalOverlay.classList.contains(
+                        'show'
+                    )
+                ) {
+                    closeConfirmModal(false);
+                }
+            }
+        );
+
+
+        document.addEventListener(
+            'submit',
+            async function (event) {
+
+                const form =
+                    event.target.closest(
+                        'form[data-confirm]'
+                    );
+
+                if (!form) {
+                    return;
+                }
+
+                /*
+                 * Jika sudah dikonfirmasi,
+                 * jangan tampilkan modal lagi.
+                 */
+                if (
+                    form.dataset.confirmed ===
+                    'true'
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                const confirmed =
+                    await showConfirm({
+                        title:
+                            form.dataset
+                                .confirmTitle ||
+                            'Konfirmasi',
+
+                        message:
+                            form.dataset
+                                .confirm,
+
+                        confirmText:
+                            form.dataset
+                                .confirmButton ||
+                            'Lanjutkan',
+
+                        cancelText:
+                            form.dataset
+                                .confirmCancel ||
+                            'Batal',
+
+                        type:
+                            form.dataset
+                                .confirmType ||
+                            'danger'
+                    });
+
+                if (!confirmed) {
+                    return;
+                }
+
+                form.dataset.confirmed =
+                    'true';
+
+                form.requestSubmit();
+            }
+        );
     </script>
 </body>
 
