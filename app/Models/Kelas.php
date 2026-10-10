@@ -22,4 +22,9 @@ class Kelas extends Model
     {
         return $this->hasMany(Mutasi::class, 'kelas_id');
     }
+
+    public function riwayatKelas()
+    {
+        return $this->hasMany(RiwayatKelas::class, 'kelas_id');
+    }
 }

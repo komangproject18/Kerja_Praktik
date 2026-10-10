@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Mutasi;
 use App\Models\Siswa;
 use App\Models\Kelas;
+use App\Models\TahunAjaran;
+use App\Models\RiwayatKelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -62,6 +64,17 @@ class MutasiController extends Controller
             'sekolah_asal_tujuan.required' => 'Sekolah asal wajib diisi.',
         ]);
 
+        $tahunAjaranAktif = TahunAjaran::where('status_aktif', true)->first();
+
+        if (!$tahunAjaranAktif) {
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Belum ada tahun ajaran aktif. Aktifkan tahun ajaran terlebih dahulu sebelum menambahkan siswa mutasi masuk.'
+                );
+        }
+
         $fotoPath = null;
 
         if ($request->hasFile('foto')) {
@@ -69,7 +82,7 @@ class MutasiController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($request, $fotoPath) {
+            DB::transaction(function () use ($request, $fotoPath, $tahunAjaranAktif) {
 
                 $siswa = Siswa::create([
                     'nama' => $request->nama,
@@ -99,6 +112,17 @@ class MutasiController extends Controller
                     'sekolah_asal_tujuan' => $request->sekolah_asal_tujuan,
                     'keterangan' => $request->keterangan,
                 ]);
+
+                RiwayatKelas::updateOrCreate(
+                    [
+                        'siswa_id' => $siswa->id,
+                        'kelas_id' => $request->kelas_id,
+                        'tahun_ajaran_id' => $tahunAjaranAktif->id,
+                    ],
+                    [
+                        'keterangan' => 'Mutasi Masuk',
+                    ]
+                );
             });
         } catch (\Throwable $e) {
 

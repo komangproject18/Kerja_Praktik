@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kelas;
+use App\Models\Siswa;
+use App\Models\TahunAjaran;
+use App\Models\RiwayatKelas;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class KelasController extends Controller
 {
@@ -54,10 +58,98 @@ class KelasController extends Controller
 
     public function show($id)
     {
-        $kelas = Kelas::with('siswa')
-            ->findOrFail($id);
+        $kelas = Kelas::with([
+            'siswa' => function ($query) {
+                $query->where('status_siswa', 'Aktif')
+                    ->orderBy('nama', 'asc');
+            }
+        ])->findOrFail($id);
 
-        return view('kelas.show', compact('kelas'));
+        $semuaKelas = Kelas::orderBy('nama_kelas', 'asc')->get();
+
+        $tahunAjaranAktif = TahunAjaran::where('status_aktif', true)->first();
+
+        return view('kelas.show', compact(
+            'kelas',
+            'semuaKelas',
+            'tahunAjaranAktif'
+        ));
+    }
+
+    public function naikKelas(Request $request, $id)
+    {
+        $kelasAsal = Kelas::findOrFail($id);
+
+        $request->validate([
+            'selected_ids' => 'required|array|min:1',
+            'selected_ids.*' => 'integer|exists:siswa,id',
+            'kelas_tujuan_id' => 'required|exists:kelas,id',
+        ], [
+            'selected_ids.required' => 'Pilih minimal satu siswa.',
+            'selected_ids.min' => 'Pilih minimal satu siswa.',
+            'kelas_tujuan_id.required' => 'Kelas tujuan wajib dipilih.',
+            'kelas_tujuan_id.exists' => 'Kelas tujuan tidak valid.',
+        ]);
+
+        if ((int) $request->kelas_tujuan_id === (int) $kelasAsal->id) {
+            return back()->with('error', 'Kelas tujuan tidak boleh sama dengan kelas asal.');
+        }
+
+        $tahunAjaranAktif = TahunAjaran::where('status_aktif', true)->first();
+
+        if (!$tahunAjaranAktif) {
+            return back()->with(
+                'error',
+                'Belum ada tahun ajaran aktif. Aktifkan tahun ajaran terlebih dahulu.'
+            );
+        }
+
+        $kelasTujuan = Kelas::findOrFail($request->kelas_tujuan_id);
+
+        $siswa = Siswa::whereIn('id', $request->selected_ids)
+            ->where('kelas_id', $kelasAsal->id)
+            ->where('status_siswa', 'Aktif')
+            ->get();
+
+        if ($siswa->isEmpty()) {
+            return back()->with('error', 'Tidak ada siswa yang dapat diproses.');
+        }
+
+        DB::transaction(function () use (
+            $siswa,
+            $kelasTujuan,
+            $tahunAjaranAktif
+        ) {
+            foreach ($siswa as $item) {
+
+                $item->update([
+                    'kelas_id' => $kelasTujuan->id,
+                ]);
+
+                RiwayatKelas::updateOrCreate(
+                    [
+                        'siswa_id' => $item->id,
+                        'kelas_id' => $kelasTujuan->id,
+                        'tahun_ajaran_id' => $tahunAjaranAktif->id,
+                    ],
+                    [
+                        'keterangan' => 'Naik Kelas',
+                    ]
+                );
+            }
+        });
+
+        return redirect()
+            ->route('kelas.show', $kelasAsal->id)
+            ->with(
+                'success',
+                $siswa->count() .
+                    ' siswa berhasil dinaikkan ke kelas ' .
+                    $kelasTujuan->nama_kelas .
+                    ' pada tahun ajaran ' .
+                    $tahunAjaranAktif->nama_tahun_ajaran .
+                    '.'
+            );
     }
 
     public function edit($id)
@@ -103,6 +195,80 @@ class KelasController extends Controller
                 ->withInput()
                 ->with('error', 'Gagal memperbarui data kelas: ' . $e->getMessage());
         }
+    }
+
+    public function jadikanAlumni(Request $request, $id)
+    {
+        $kelas = Kelas::findOrFail($id);
+
+        $request->validate([
+            'selected_ids' => 'required|array|min:1',
+            'selected_ids.*' => 'integer|exists:siswa,id',
+        ], [
+            'selected_ids.required' => 'Pilih minimal satu siswa.',
+            'selected_ids.min' => 'Pilih minimal satu siswa.',
+        ]);
+
+        $tahunAjaranAktif = TahunAjaran::where('status_aktif', true)->first();
+
+        if (!$tahunAjaranAktif) {
+            return back()->with(
+                'error',
+                'Belum ada tahun ajaran aktif. Aktifkan tahun ajaran terlebih dahulu.'
+            );
+        }
+
+        $siswa = Siswa::whereIn('id', $request->selected_ids)
+            ->where('kelas_id', $kelas->id)
+            ->where('status_siswa', 'Aktif')
+            ->get();
+
+        if ($siswa->isEmpty()) {
+            return back()->with(
+                'error',
+                'Tidak ada siswa yang dapat diproses menjadi alumni.'
+            );
+        }
+
+        DB::transaction(function () use (
+            $siswa,
+            $kelas,
+            $tahunAjaranAktif
+        ) {
+            foreach ($siswa as $item) {
+
+                /*
+             * Pastikan kelas terakhir siswa tetap tercatat
+             * dalam riwayat sebelum kelas_id dikosongkan.
+             */
+                RiwayatKelas::firstOrCreate(
+                    [
+                        'siswa_id' => $item->id,
+                        'kelas_id' => $kelas->id,
+                        'tahun_ajaran_id' => $tahunAjaranAktif->id,
+                    ],
+                    [
+                        'keterangan' => 'Lulus',
+                    ]
+                );
+
+                $item->update([
+                    'status_siswa' => 'Alumni',
+                    'kelas_id' => null,
+                    'tahun_lulus_id' => $tahunAjaranAktif->id,
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route('kelas.show', $kelas->id)
+            ->with(
+                'success',
+                $siswa->count() .
+                    ' siswa berhasil dijadikan alumni tahun ajaran ' .
+                    $tahunAjaranAktif->nama_tahun_ajaran .
+                    '.'
+            );
     }
 
     public function destroy($id)

@@ -13,6 +13,7 @@ class Siswa extends Model
         'nik',
         'foto',
         'status_siswa',
+        'tahun_lulus_id',
         'nis',
         'nisn',
         'tempat_lahir',
@@ -46,5 +47,21 @@ class Siswa extends Model
     public function mutasi()
     {
         return $this->hasMany(Mutasi::class, 'siswa_id');
+    }
+
+    public function riwayatKelas()
+    {
+        return $this->hasMany(RiwayatKelas::class, 'siswa_id');
+    }
+
+    public function riwayatKelasTerakhir()
+    {
+        return $this->hasOne(RiwayatKelas::class, 'siswa_id')
+            ->latestOfMany();
+    }
+
+    public function tahunLulus()
+    {
+        return $this->belongsTo(TahunAjaran::class, 'tahun_lulus_id');
     }
 }

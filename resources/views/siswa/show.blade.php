@@ -22,23 +22,23 @@
         <div style="margin-bottom: 22px;">
             @if ($siswa->foto)
                 <img src="{{ asset('storage/' . $siswa->foto) }}" alt="Foto {{ $siswa->nama }}" style="
-                        width: 150px;
-                        height: 190px;
-                        object-fit: cover;
-                        border-radius: 12px;
-                        border: 1px solid #e2e8f0;
-                    ">
+                                width: 150px;
+                                height: 190px;
+                                object-fit: cover;
+                                border-radius: 12px;
+                                border: 1px solid #e2e8f0;
+                            ">
             @else
                 <div style="
-                    width: 150px;
-                    height: 190px;
-                    background: #f1f5f9;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #64748b;
-                ">
+                            width: 150px;
+                            height: 190px;
+                            background: #f1f5f9;
+                            border-radius: 12px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: #64748b;
+                        ">
                     Belum ada foto
                 </div>
             @endif
@@ -64,7 +64,8 @@
             <tr>
                 <th>Tempat, Tanggal Lahir</th>
                 <td>{{ $siswa->tempat_lahir ?? '-' }},
-                    {{ $siswa->tanggal_lahir ? date('d-m-Y', strtotime($siswa->tanggal_lahir)) : '-' }}</td>
+                    {{ $siswa->tanggal_lahir ? date('d-m-Y', strtotime($siswa->tanggal_lahir)) : '-' }}
+                </td>
             </tr>
             <tr>
                 <th>Jenis Kelamin</th>
@@ -103,6 +104,70 @@
                 <td>{{ $siswa->tanggal_diterima ? date('d-m-Y', strtotime($siswa->tanggal_diterima)) : '-' }}</td>
             </tr>
         </table>
+    </div>
+
+    <div class="form-card">
+        <div class="form-section-title">
+            Riwayat Kelas
+        </div>
+
+        @php
+            $riwayatPerTahun = $siswa->riwayatKelas
+                ->sortByDesc(function ($item) {
+                    return $item->tahunAjaran->nama_tahun_ajaran ?? '';
+                })
+                ->groupBy(function ($item) {
+                    return $item->tahunAjaran->nama_tahun_ajaran ?? 'Tanpa Tahun Ajaran';
+                });
+        @endphp
+
+        @forelse ($riwayatPerTahun as $tahunAjaran => $riwayat)
+            <div style="
+                    margin-bottom: 18px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 12px;
+                    overflow: hidden;
+                ">
+                <div style="
+                        padding: 12px 16px;
+                        background: #f8fafc;
+                        font-weight: 700;
+                        color: #0f172a;
+                        border-bottom: 1px solid #e2e8f0;
+                    ">
+                    Tahun Ajaran {{ $tahunAjaran }}
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kelas</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($riwayat as $item)
+                                <tr>
+                                    <td>
+                                        {{ $item->kelas->nama_kelas ?? '-' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $item->keterangan ?? '-' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @empty
+            <div class="empty-data">
+                Belum ada riwayat kelas siswa.
+            </div>
+        @endforelse
     </div>
 
     <div class="form-card">

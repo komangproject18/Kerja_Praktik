@@ -8,6 +8,8 @@ use App\Models\Siswa;
 use App\Models\Kelas;
 use App\Models\OrangTua;
 use App\Models\Wali;
+use App\Models\TahunAjaran;
+use App\Models\RiwayatKelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -161,13 +163,26 @@ class SiswaController extends Controller
                     'penanggung_jawab' => 'Data orang tua atau data wali wajib diisi minimal salah satu.',
                 ]);
         }
+
+        $tahunAjaranAktif = null;
+
+        if ($request->filled('kelas_id')) {
+            $tahunAjaranAktif = TahunAjaran::where('status_aktif', true)->first();
+
+            if (!$tahunAjaranAktif) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Belum ada tahun ajaran aktif. Aktifkan tahun ajaran terlebih dahulu.');
+            }
+        }
+
         $fotoPath = null;
 
         if ($request->hasFile('foto')) {
             $fotoPath = $request->file('foto')->store('siswa', 'public');
         }
 
-        DB::transaction(function () use ($request, $adaOrangTua, $adaWali, $fotoPath) {
+        DB::transaction(function () use ($request, $adaOrangTua, $adaWali, $fotoPath, $tahunAjaranAktif) {
             $siswa = Siswa::create([
                 'nama' => $request->nama,
                 'nik' => $request->nik,
@@ -185,6 +200,7 @@ class SiswaController extends Controller
                 'asal_sekolah' => $request->asal_sekolah,
                 'kelas_id' => $request->kelas_id,
                 'tanggal_diterima' => $request->tanggal_diterima,
+                'status_siswa' => 'Aktif',
             ]);
 
             if ($adaOrangTua) {
@@ -208,6 +224,19 @@ class SiswaController extends Controller
                     'pekerjaan_wali' => $request->pekerjaan_wali,
                 ]);
             }
+
+            if ($siswa->kelas_id && $tahunAjaranAktif) {
+                RiwayatKelas::updateOrCreate(
+                    [
+                        'siswa_id' => $siswa->id,
+                        'kelas_id' => $siswa->kelas_id,
+                        'tahun_ajaran_id' => $tahunAjaranAktif->id,
+                    ],
+                    [
+                        'keterangan' => 'Siswa Baru',
+                    ]
+                );
+            }
         });
 
         return redirect()
@@ -217,7 +246,7 @@ class SiswaController extends Controller
 
     public function show($id)
     {
-        $siswa = Siswa::with(['kelas', 'orangTua', 'wali'])->findOrFail($id);
+        $siswa = Siswa::with(['kelas', 'orangTua', 'wali','riwayatKelas.kelas', 'riwayatKelas.tahunAjaran',])->findOrFail($id);
 
         return view('siswa.show', compact('siswa'));
     }
